@@ -1,0 +1,142 @@
+
+mixin Badge(method)
+    //- Draw a badge for a given HTTP method
+    case method
+        when 'GET'
+            span.badge.get: i.fa.fa-arrow-down
+        when 'HEAD'
+            span.badge.head: i.fa.fa-info-circle
+        when 'OPTIONS'
+            span.badge.options: i.fa.fa-dot-circle-o
+        when 'POST'
+            span.badge.post: i.fa.fa-plus
+        when 'PUT'
+            span.badge.put: i.fa.fa-pencil
+        when 'PATCH'
+            span.badge.patch: i.fa.fa-pencil
+        when 'DELETE'
+            span.badge.delete: i.fa.fa-times
+        default
+            span.badge: i.fa.fa-dot-circle-o
+
+mixin Parameters(params)
+    //- Draw a definition list of parameter names, types, defaults,
+    //- examples and descriptions.
+    .title
+        strong Paramètres
+    .collapse-content
+        dl.inner: each param in params || []
+            dt= self.urldec(param.name)
+            dd
+                code= param.type || 'string'
+                | &nbsp;
+                if param.required
+                    span.required (requis)
+                else
+                    span (optionnel)
+                | &nbsp;
+                if param.default
+                    span.text-info.default
+                        strong Par défaut:&nbsp;
+                        span= param.default
+                    | &nbsp;
+                if param.example
+                    span.text-muted.example
+                        strong Exemple:&nbsp;
+                        span= param.example
+                != self.markdown(param.description)
+                if param.values.length
+                    p.choices
+                        strong Choix:&nbsp;
+                        each value in param.values
+                            code= self.urldec(value.value)
+                            = ' '
+
+mixin RequestResponse(title, request, collapse)
+    .title
+        strong
+            = title
+            if request.name
+                | &nbsp;&nbsp;
+                code= request.name
+    +RequestResponseBody(request, collapse)
+
+mixin RequestResponseBody(request, collapse, showBlank)
+    if request.hasContent || showBlank
+        div(class=collapse ? 'collapse-content' : ''): .inner
+            if request.description
+                .description!= self.markdown(request.description)
+
+            if Object.keys(request.headers).length
+                h5 Entêtes
+                pre: code
+                    each item, index in request.headers
+                        != self.highlight(item.name + ': ' + item.value, 'http')
+                        if index < request.headers.length - 1
+                          br
+            if request.body
+                h5 Corps
+                pre: code
+                    != self.highlight(request.body, null, ['json', 'yaml', 'xml', 'javascript'])
+            if request.schema
+                h5 Schéma
+                pre: code
+                    != self.highlight(request.schema, null, ['json', 'yaml', 'xml'])
+            if !request.hasContent
+                .description.text-muted Cette réponse n'a pas de contenu.
+
+mixin Examples(resourceGroup, resource, action)
+    each example in action.examples
+        each request in example.requests
+            +RequestResponse('Requête', request, true)
+        each response in example.responses
+            +RequestResponse('Réponse', response, true)
+
+mixin Content()
+    //- Page header and API description
+    header
+        h1#top!= self.api.name || 'Documentation API'
+
+    if self.api.descriptionHtml
+        != self.api.descriptionHtml
+
+    //- Loop through and display information about all the resource
+    //- groups, resources, and actions.
+    each resourceGroup in self.api.resourceGroups || []
+        section.resource-group(id=resourceGroup.elementId)
+            h2.group-heading
+                != resourceGroup.name || 'Ressources'
+            if resourceGroup.descriptionHtml
+                != resourceGroup.descriptionHtml
+
+            each resource in resourceGroup.resources || []
+                .resource(id=resource.elementId)
+                    h3.resource-heading
+                        != resource.name || ((resource.actions[0] != null) && resource.actions[0].name) || 'Ressource'
+                    if resource.description
+                        != self.markdown(resource.description)
+
+                    each action in resource.actions || []
+                        .action(class=action.methodLower, id=action.elementId)
+                            h4.action-heading
+                                .name!= action.name
+                                a.method(class=action.methodLower, href=action.elementLink)
+                                    = action.method
+                                code.uri= self.urldec(action.uriTemplate)
+                            if action.description
+                                != self.markdown(action.description)
+
+                            h4 Exemple
+                            .definition
+                                span.method(class=action.methodLower)= action.method
+                                | &nbsp;
+                                span.uri
+                                  span.hostname= self.api.host
+                                  != action.colorizedUriTemplate
+
+                            //- A list of sub-sections for parameters, requests
+                            //- and responses.
+                            if action.parameters.length
+                                +Parameters(action.parameters)
+                            if action.examples
+                                +Examples(resourceGroup, resource, action)

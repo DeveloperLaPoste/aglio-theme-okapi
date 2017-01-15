@@ -1,0 +1,35 @@
+{
+  "name": "aglio-theme-okapi",
+  "version": "0.0.1",
+  "description": "Custom aglio theme based on olio",
+  "main": "lib/main.js",
+  "scripts": {
+    "lint": "eslint .",
+    "postinstall": "mkdirp cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:DeveloperLaPoste/okapi-sdk-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DeveloperLaPoste/okapi-sdk-js/issues"
+  },
+  "author": "Developer <developer@laposte.io> (https://developer.laposte.fr/)",
+  "license": "MIT",
+  "dependencies": {
+    "highlight.js": "^9.9.0",
+    "jade": "^1.11.0",
+    "less": "^2.7.2",
+    "markdown-it": "^8.2.2",
+    "markdown-it-checkbox": "^1.1.0",
+    "markdown-it-container": "^2.0.0",
+    "markdown-it-emoji": "^1.3.0",
+    "mkdirp": "^0.5.1",
+    "moment": "^2.17.1",
+    "querystring": "^0.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.13.1",
+    "eslint-config-nodejs": "^1.1.0"
+  }
+}

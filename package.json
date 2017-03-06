@@ -1,6 +1,6 @@
 {
   "name": "aglio-theme-okapi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Custom aglio theme based on olio",
   "main": "lib/main.js",
   "scripts": {

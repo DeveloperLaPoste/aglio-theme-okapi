@@ -111,11 +111,6 @@ mixin Content()
 
             each resource in resourceGroup.resources || []
                 .resource(id=resource.elementId)
-                    h3.resource-heading
-                        != resource.name || ((resource.actions[0] != null) && resource.actions[0].name) || 'Ressource'
-                    if resource.description
-                        != self.markdown(resource.description)
-
                     each action in resource.actions || []
                         .action(class=action.methodLower, id=action.elementId)
                             h4.action-heading
